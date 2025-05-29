@@ -4,6 +4,7 @@ import blogService from './services/blog'
 import LoginForm from './components/loginForm'
 import Togglable from './components/toggle'
 import BlogForm from './components/blogForm' 
+import BlogItem from './components/blog'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -141,50 +142,6 @@ const App = () => {
     })
 
 
-  const BlogItem = ({ blog }) => {
-    const [blogVisible, setBlogVisible] = useState(false)
-    
-    const toggleVisibility = () => {
-      setBlogVisible(!blogVisible)
-    }
-
-    return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ 
-        border: '1px solid #ddd', 
-        padding: '10px', 
-        margin: '5px 0',
-        borderRadius: '4px'
-      }}>
-        <h3>{blog.title}</h3>
-      <div style={blogVisible ? { display: '' } : { display: 'none' }}>
-        <p><strong>Author:</strong> {blog.author}</p>
-        <p>
-        <strong>URL:</strong> 
-        <a href={blog.url} target="_blank" rel="noopener noreferrer">
-          {blog.url}
-        </a>
-        </p>
-        <p><strong>Likes:</strong> {blog.likes || 0}</p>
-        
-        <div style={{ marginTop: '10px' }}>
-        <button onClick={() => updateLikes(blog.id, blog.likes || 0)}>
-          👍 Like
-        </button>
-        <button 
-          onClick={() => deleteBlog(blog.id, blog.title)}
-          style={{ marginLeft: '10px', backgroundColor: '#ff4444', color: 'white' }}
-        >
-          Delete
-        </button>
-        </div>
-      </div>
-      </div>
-      <button onClick={toggleVisibility}>
-      {blogVisible ? 'hide' : 'view'}
-      </button>
-    </div>
-    )}
 
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
@@ -253,7 +210,7 @@ const App = () => {
             <p>No blogs found. Add some blogs!</p>
           ) : (
             filteredAndSortedBlogs.map(blog => (
-              <BlogItem key={blog.id} blog={blog} />
+              <BlogItem key={blog.id} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog}/>
             ))
           )}
         </div>

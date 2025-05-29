@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import loginService from './services/login' 
 import blogService from './services/blog'
+import LoginForm from './components/loginForm'
+import Togglable from './components/toggle'
+import BlogForm from './components/blogForm' 
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState({
-    title: '',
-    author: '',
-    url: '',
-    likes: 0
-  })
-  const [showForm, setShowForm] = useState(false)
   const [notification, setNotification] = useState('')
   const [sortBy, setSortBy] = useState('title')
   const [filterAuthor, setFilterAuthor] = useState('')
-  
+
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const blogFormRef = useRef()
 
   // Check for existing user token on mount
   useEffect(() => {
@@ -79,13 +77,12 @@ const App = () => {
     }
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
+  const addBlog = async (blogObject) => {
     try {
-      const blogData = await blogService.create(newBlog)
+      console.log('Adding blog:', blogObject)
+      const blogData = await blogService.create(blogObject)
+      blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(blogData))
-      setNewBlog({ title: '', author: '', url: '', likes: 0 })
-      setShowForm(false)
       showNotification(`Added blog: ${blogData.title}`)
     } catch (error) {
       console.error('Add blog error:', error)
@@ -126,14 +123,6 @@ const App = () => {
     setTimeout(() => setNotification(''), 3000)
   }
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target
-    setNewBlog({
-      ...newBlog,
-      [name]: name === 'likes' ? Number(value) : value
-    })
-  }
-
   // Filter and sort blogs
   const filteredAndSortedBlogs = blogs
     .filter(blog => 
@@ -150,85 +139,6 @@ const App = () => {
           return (a.title || '').localeCompare(b.title || '')
       }
     })
-
-  const loginForm = () => (
-    <div>
-      <h2>Login to Blog App</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
-  )
-
-  const BlogForm = () => (
-    <div style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0' }}>
-      <h3>Add New Blog</h3>
-      <form onSubmit={addBlog}>
-        <div style={{ margin: '5px 0' }}>
-          <label>Title: </label>
-          <input
-            type="text"
-            name="title"
-            value={newBlog.title}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div style={{ margin: '5px 0' }}>
-          <label>Author: </label>
-          <input
-            type="text"
-            name="author"
-            value={newBlog.author}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div style={{ margin: '5px 0' }}>
-          <label>URL: </label>
-          <input
-            type="url"
-            name="url"
-            value={newBlog.url}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div style={{ margin: '5px 0' }}>
-          <label>Likes: </label>
-          <input
-            type="number"
-            name="likes"
-            value={newBlog.likes}
-            onChange={handleInputChange}
-            min="0"
-          />
-        </div>
-        <button type="submit">Add Blog</button>
-        <button type="button" onClick={() => setShowForm(false)}>
-          Cancel
-        </button>
-      </form>
-    </div>
-  )
 
   const BlogItem = ({ blog }) => (
     <div style={{ 
@@ -264,7 +174,15 @@ const App = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       {user === null ? (
-        loginForm()
+        <Togglable buttonLabel='login'>
+          <LoginForm
+            username={username}
+            password={password}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            handleSubmit={handleLogin}
+          />
+       </Togglable>
       ) : (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
@@ -287,13 +205,11 @@ const App = () => {
             </div>
           )}
 
-          <div style={{ margin: '20px 0' }}>
-            <button onClick={() => setShowForm(!showForm)}>
-              {showForm ? 'Hide Form' : 'Add New Blog'}
-            </button>
-          </div>
-
-          {showForm && <BlogForm />}
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+              <BlogForm
+              createBlog={addBlog}
+            />
+          </Togglable>
 
           <div style={{ margin: '20px 0' }}>
             <div style={{ margin: '10px 0' }}>

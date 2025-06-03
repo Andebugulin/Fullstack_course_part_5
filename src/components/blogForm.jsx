@@ -35,6 +35,7 @@ const BlogForm = ({ createBlog }) => {
         <div style={{ margin: '5px 0' }}>
           <label>Title: </label>
           <input
+            data-testid="title"
             type="text"
             name="title"
             value={newBlog.title}
@@ -45,6 +46,7 @@ const BlogForm = ({ createBlog }) => {
         <div style={{ margin: '5px 0' }}>
           <label>Author: </label>
           <input
+            data-testid="author"
             type="text"
             name="author"
             value={newBlog.author}
@@ -55,6 +57,7 @@ const BlogForm = ({ createBlog }) => {
         <div style={{ margin: '5px 0' }}>
           <label>URL: </label>
           <input
+            data-testid="url"
             type="url"
             name="url"
             value={newBlog.url}
@@ -65,6 +68,7 @@ const BlogForm = ({ createBlog }) => {
         <div style={{ margin: '5px 0' }}>
           <label>Likes: </label>
           <input
+            data-testid="likes"
             type="number"
             name="likes"
             value={newBlog.likes}

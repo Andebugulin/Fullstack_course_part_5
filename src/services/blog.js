@@ -11,6 +11,7 @@ const getAll = async () => {
   const config = {
     headers: { Authorization: token },
   }
+  console.log('Fetching blogs with token:', token)
   const response = await axios.get(baseUrl, config)
   return response.data
 }

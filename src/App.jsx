@@ -46,6 +46,7 @@ const App = () => {
 
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       blogService.setToken(user.token)
+      console.log('token set:', user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -147,6 +148,18 @@ const App = () => {
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
       {user === null ? (
         <Togglable buttonLabel='login'>
+        {notification && (
+          <div style={{
+            padding: '10px',
+            margin: '10px 0',
+            backgroundColor: '#dff0d8',
+            border: '1px solid #d6e9c6',
+            borderRadius: '4px',
+            color: '#3c763d'
+          }}>
+            {notification}
+          </div>
+        )}
           <LoginForm
             username={username}
             password={password}
@@ -210,8 +223,13 @@ const App = () => {
             <p>No blogs found. Add some blogs!</p>
           ) : (
             filteredAndSortedBlogs.map(blog => (
-              <BlogItem key={blog.id} blog={blog} updateLikes={updateLikes} deleteBlog={deleteBlog}/>
-            ))
+            <BlogItem 
+              key={blog.id} 
+              blog={blog} 
+              updateLikes={updateLikes} 
+              deleteBlog={deleteBlog}
+              currentUser={user}  
+            />            ))
           )}
         </div>
       )}
